@@ -55,7 +55,7 @@ def ShowCategory( category ):
 			showId = showInfo[0]
 			thumbnail = "http://www.channel4.com" + showInfo[1]
 			progTitle = showInfo[2]
-			progTitle = progTitle.replace( '&amp', '&' )
+			progTitle = progTitle.replace( '&amp;', '&' )
 			synopsis = showInfo[3].strip()
 			synopsis = synopsis.replace( '&amp;', '&' )
 			synopsis = synopsis.replace( '&pound;', '£' )
@@ -76,6 +76,7 @@ def ShowCategory( category ):
 def ShowEpisodes( showId, showTitle ):
 	print "Looking for episodes for: " + showTitle
 	html = geturllib.GetURL( "http://www.channel4.com/programmes/" + showId + "/4od", 20000 ) # ~6 hrs
+	genre = re.search( '<meta name="primaryBrandCategory" content="(.*?)"/>', html, re.DOTALL ).groups()[0]
 	ol = re.search( '<ol class="all-series">(.*?)</div>', html, re.DOTALL ).groups()[0]
 	epsInfo = re.findall( '<li.*?data-episode-number="(.*?)".*?data-assetid="(.*?)".*?data-episodeUrl="(.*?)".*?data-image-url="(.*?)".*?data-episodeTitle="(.*?)".*?data-episodeInfo="(.*?)".*?data-episodeSynopsis="(.*?)".*?data-series-number="(.*?)"', ol, re.DOTALL )
 	
@@ -108,7 +109,7 @@ def ShowEpisodes( showId, showTitle ):
 		
 		newListItem = xbmcgui.ListItem( label )
 		newListItem.setThumbnailImage(thumbnail)
-		newListItem.setInfo('video', {'Title': label, 'Plot': description, 'PlotOutline': description})
+		newListItem.setInfo('video', {'Title': label, 'Plot': description, 'PlotOutline': description, 'Genre': genre})
 		url = gBaseURL + '?ep=' + mycgi.URLEscape(id) + "&title=" + mycgi.URLEscape(label) + "&fn=" + mycgi.URLEscape(fn)
 		listItems.append( (url,newListItem,False) )
 	
