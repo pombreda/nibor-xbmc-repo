@@ -80,6 +80,7 @@ def ShowEpisodes( showId, showTitle ):
 	epsInfo = re.findall( '<li.*?data-episode-number="(.*?)".*?data-assetid="(.*?)".*?data-episodeUrl="(.*?)".*?data-image-url="(.*?)".*?data-txDate="(.*?)".*?data-episodeTitle="(.*?)".*?data-episodeInfo="(.*?)".*?data-episodeSynopsis="(.*?)".*?data-series-number="(.*?)"', ol, re.DOTALL )
 	
 	listItems = []
+	epsDict = dict()
 	for epInfo in epsInfo:
 		epNum = epInfo[0]
 		try: epNumInt = int(epNum)
@@ -91,29 +92,33 @@ def ShowEpisodes( showId, showTitle ):
 		else:
 			fn = showId
 		id = epInfo[1]
-		img = epInfo[3]
-		progTitle = epInfo[5].strip()
-		progTitle = progTitle.replace( '&amp;', '&' )
-		epTitle = epInfo[6].strip()
-		if ( progTitle == showTitle and epTitle <> "" ):
-			label = epTitle
-		else:
-			label = progTitle
-		url = "http://www.channel4.com" + epInfo[2]
-		description = remove_extra_spaces(remove_html_tags(epInfo[7]))
-		description = description.replace( '&amp;', '&' )
-		description = description.replace( '&pound;', '£' )
-		if (img == ""):
-			thumbnail = re.search( '<meta property="og:image" content="(.*?)"', html, re.DOTALL ).groups()[0]
-		else:
-			thumbnail = "http://www.channel4.com" + img
 		
-		newListItem = xbmcgui.ListItem( label )
-		newListItem.setThumbnailImage(thumbnail)
-		newListItem.setInfo('video', {'Title': label, 'Plot': description, 'PlotOutline': description, 'Genre': genre, 'premiered': premieredDate, 'Episode': epNumInt})
-		newListItem.setProperty('IsPlayable', 'true')
-		url = gBaseURL + '?ep=' + mycgi.URLEscape(id) + "&title=" + mycgi.URLEscape(label) + "&fn=" + mycgi.URLEscape(fn)
-		listItems.append( (url,newListItem,False) )
+		if ( not id in epsDict ):
+			epsDict[id] = 1
+			
+			img = epInfo[3]
+			progTitle = epInfo[5].strip()
+			progTitle = progTitle.replace( '&amp;', '&' )
+			epTitle = epInfo[6].strip()
+			if ( progTitle == showTitle and epTitle <> "" ):
+				label = epTitle
+			else:
+				label = progTitle
+			url = "http://www.channel4.com" + epInfo[2]
+			description = remove_extra_spaces(remove_html_tags(epInfo[7]))
+			description = description.replace( '&amp;', '&' )
+			description = description.replace( '&pound;', '£' )
+			description = description.replace( '&quot;', "'" )
+			if (img == ""):
+				thumbnail = re.search( '<meta property="og:image" content="(.*?)"', html, re.DOTALL ).groups()[0]
+			else:
+				thumbnail = "http://www.channel4.com" + img
+			
+			newListItem = xbmcgui.ListItem( label )
+			newListItem.setThumbnailImage(thumbnail)
+			newListItem.setInfo('video', {'Title': label, 'Plot': description, 'PlotOutline': description, 'Genre': genre, 'premiered': premieredDate, 'Episode': epNumInt})
+			url = gBaseURL + '?ep=' + mycgi.URLEscape(id) + "&title=" + mycgi.URLEscape(label) + "&fn=" + mycgi.URLEscape(fn)
+			listItems.append( (url,newListItem,False) )
 	
 	xbmcplugin.addDirectoryItems( handle=gPluginHandle, items=listItems )
 	xbmcplugin.setContent(handle=gPluginHandle, content='episodes')
@@ -274,6 +279,8 @@ def DoSearchQuery( query ):
 		progUrl  = info[2]
 		
 		title = title.replace( '&amp;', '&' )
+		title = title.replace( '&pound;', '£' )
+		title = title.replace( '&quot;', "'" )
 		
 		img = "http://www.channel4.com" + img
 		showId = re.search( 'programmes/(.*?)/4od', progUrl, re.DOTALL ).groups()[0]
