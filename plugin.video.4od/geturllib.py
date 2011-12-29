@@ -90,8 +90,12 @@ def _Cache_Add( url, data ):
 #==============================================================================
 
 def _Cache_CreateKey( url ):
-	from hashlib import md5
-	return  md5(url).hexdigest()
+	try:
+		from hashlib import md5
+		return md5(url).hexdigest()
+	except:
+		import md5
+		return  md5.new(url).hexdigest()
 
 #==============================================================================
 
