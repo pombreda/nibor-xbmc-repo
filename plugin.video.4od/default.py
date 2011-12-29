@@ -74,7 +74,6 @@ def ShowCategory( category ):
 #==============================================================================
 
 def ShowEpisodes( showId, showTitle ):
-	print "Looking for episodes for: " + showTitle
 	html = geturllib.GetURL( "http://www.channel4.com/programmes/" + showId + "/4od", 20000 ) # ~6 hrs
 	genre = re.search( '<meta name="primaryBrandCategory" content="(.*?)"/>', html, re.DOTALL ).groups()[0]
 	ol = re.search( '<ol class="all-series">(.*?)</div>', html, re.DOTALL ).groups()[0]
@@ -83,6 +82,8 @@ def ShowEpisodes( showId, showTitle ):
 	listItems = []
 	for epInfo in epsInfo:
 		epNum = epInfo[0]
+		try: epNumInt = int(epNum)
+		except: epNumInt = ""
 		premieredDate = epInfo[4]
 		seriesNum = epInfo[8]
 		if ( seriesNum <> "" and epNum <> "" ):
@@ -90,7 +91,6 @@ def ShowEpisodes( showId, showTitle ):
 		else:
 			fn = showId
 		id = epInfo[1]
-		print "FOUND id: " + id
 		img = epInfo[3]
 		progTitle = epInfo[5].strip()
 		progTitle = progTitle.replace( '&amp;', '&' )
@@ -110,7 +110,7 @@ def ShowEpisodes( showId, showTitle ):
 		
 		newListItem = xbmcgui.ListItem( label )
 		newListItem.setThumbnailImage(thumbnail)
-		newListItem.setInfo('video', {'Title': label, 'Plot': description, 'PlotOutline': description, 'Genre': genre, 'premiered': premieredDate, 'Episode': epNum})
+		newListItem.setInfo('video', {'Title': label, 'Plot': description, 'PlotOutline': description, 'Genre': genre, 'premiered': premieredDate, 'Episode': epNumInt})
 		newListItem.setProperty('IsPlayable', 'true')
 		url = gBaseURL + '?ep=' + mycgi.URLEscape(id) + "&title=" + mycgi.URLEscape(label) + "&fn=" + mycgi.URLEscape(fn)
 		listItems.append( (url,newListItem,False) )
@@ -158,7 +158,6 @@ def PlayOrDownloadEpisode( episodeId, title, defFilename='' ):
 		playpath = playpath + '?' + auth
 		swfplayer = "http://www.channel4.com/static/programmes/asset/flash/swf/4odplayer-11.8.5.swf"
 		playURL = "%s?ovpfv=1.1&%s playpath=%s swfurl=%s swfvfy=true" % (url,auth,playpath,swfplayer)
-		print "PLAYING: " + playURL
 		
 		li = xbmcgui.ListItem(title)
 		li.setInfo('video', {'Title': title})
@@ -259,7 +258,6 @@ def CreateRTMPDUMPCmd( rtmpdump_path, streamUri, auth, savePath ):
 #==============================================================================
 
 def DoSearch():
-	print "DoSearch()"
 	kb = xbmc.Keyboard( "", 'Search' )
 	kb.doModal()
 	if ( kb.isConfirmed() == False ): return
@@ -269,13 +267,13 @@ def DoSearch():
 def DoSearchQuery( query ):
 	data = geturllib.GetURL( "http://www.channel4.com/search/predictive/?q=%s" % mycgi.URLEscape(query), 10000 )
 	infos = re.findall( '{"imgUrl":"(.*?)".*?"value": "(.*?)".*?"siteUrl":"(.*?)","fourOnDemand":"true"}', data, re.DOTALL )
-	print data
 	listItems = []
 	for info in infos:
 		img = info[0]
 		title = info[1]
 		progUrl  = info[2]
-		print "progUrl: " + progUrl
+		
+		title = title.replace( '&amp;', '&' )
 		
 		img = "http://www.channel4.com" + img
 		showId = re.search( 'programmes/(.*?)/4od', progUrl, re.DOTALL ).groups()[0]
@@ -301,14 +299,12 @@ def remove_extra_spaces(data):
    
 if __name__ == "__main__":
 	try:
-		print sys.argv[2][1:]
 		geturllib.SetCacheDir( xbmc.translatePath(os.path.join( "T:"+os.sep,"addon_data", gPluginName,'cache' )) )
 		
 		if ( mycgi.EmptyQS() ):
 			ShowCategories()
 		else:
 			(category, showId, episodeId, title, search) = mycgi.Params( 'category', 'show', 'ep', 'title', 'search' )
-			print "search: " + search
 			if ( search <> '' ):
 				DoSearch()
 			elif ( showId <> '' ):
