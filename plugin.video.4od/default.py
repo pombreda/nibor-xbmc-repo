@@ -78,12 +78,13 @@ def ShowEpisodes( showId, showTitle ):
 	html = geturllib.GetURL( "http://www.channel4.com/programmes/" + showId + "/4od", 20000 ) # ~6 hrs
 	genre = re.search( '<meta name="primaryBrandCategory" content="(.*?)"/>', html, re.DOTALL ).groups()[0]
 	ol = re.search( '<ol class="all-series">(.*?)</div>', html, re.DOTALL ).groups()[0]
-	epsInfo = re.findall( '<li.*?data-episode-number="(.*?)".*?data-assetid="(.*?)".*?data-episodeUrl="(.*?)".*?data-image-url="(.*?)".*?data-episodeTitle="(.*?)".*?data-episodeInfo="(.*?)".*?data-episodeSynopsis="(.*?)".*?data-series-number="(.*?)"', ol, re.DOTALL )
+	epsInfo = re.findall( '<li.*?data-episode-number="(.*?)".*?data-assetid="(.*?)".*?data-episodeUrl="(.*?)".*?data-image-url="(.*?)".*?data-txDate="(.*?)".*?data-episodeTitle="(.*?)".*?data-episodeInfo="(.*?)".*?data-episodeSynopsis="(.*?)".*?data-series-number="(.*?)"', ol, re.DOTALL )
 	
 	listItems = []
 	for epInfo in epsInfo:
 		epNum = epInfo[0]
-		seriesNum = epInfo[7]
+		premieredDate = epInfo[4]
+		seriesNum = epInfo[8]
 		if ( seriesNum <> "" and epNum <> "" ):
 			fn = showId + ".s%0.2ie%0.2i" % (int(seriesNum),int(epNum))
 		else:
@@ -91,15 +92,15 @@ def ShowEpisodes( showId, showTitle ):
 		id = epInfo[1]
 		print "FOUND id: " + id
 		img = epInfo[3]
-		progTitle = epInfo[4].strip()
+		progTitle = epInfo[5].strip()
 		progTitle = progTitle.replace( '&amp;', '&' )
-		epTitle = epInfo[5].strip()
+		epTitle = epInfo[6].strip()
 		if ( progTitle == showTitle and epTitle <> "" ):
 			label = epTitle
 		else:
 			label = progTitle
 		url = "http://www.channel4.com" + epInfo[2]
-		description = remove_extra_spaces(remove_html_tags(epInfo[6]))
+		description = remove_extra_spaces(remove_html_tags(epInfo[7]))
 		description = description.replace( '&amp;', '&' )
 		description = description.replace( '&pound;', '£' )
 		if (img == ""):
@@ -109,7 +110,8 @@ def ShowEpisodes( showId, showTitle ):
 		
 		newListItem = xbmcgui.ListItem( label )
 		newListItem.setThumbnailImage(thumbnail)
-		newListItem.setInfo('video', {'Title': label, 'Plot': description, 'PlotOutline': description, 'Genre': genre})
+		newListItem.setInfo('video', {'Title': label, 'Plot': description, 'PlotOutline': description, 'Genre': genre, 'premiered': premieredDate, 'Episode': epNum})
+		newListItem.setProperty('IsPlayable', 'true')
 		url = gBaseURL + '?ep=' + mycgi.URLEscape(id) + "&title=" + mycgi.URLEscape(label) + "&fn=" + mycgi.URLEscape(fn)
 		listItems.append( (url,newListItem,False) )
 	
