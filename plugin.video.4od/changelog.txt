@@ -1,0 +1,7 @@
+Version 1.0.1 (29 Dec 2011)
+
+- Added a setting for default select action: Play/Download/Ask (Thanks to alcoheca)
+
+Version 1.0.0
+
+- Initial release

@@ -120,8 +120,16 @@ def ShowEpisodes( showId, showTitle ):
 
 
 def PlayOrDownloadEpisode( episodeId, title, defFilename='' ):
-	dialog = xbmcgui.Dialog()
-	ret = dialog.yesno(title, 'Do you want to play or download?', '', '', 'Download',  'Play') # 1=Play; 0=Download
+	import xbmcaddon
+	addon = xbmcaddon.Addon(id=gPluginName)
+	action = addon.getSetting( 'select_action' )
+	if ( action == 'Ask' ):
+		dialog = xbmcgui.Dialog()
+		ret = dialog.yesno(title, 'Do you want to play or download?', '', '', 'Download',  'Play') # 1=Play; 0=Download
+	elif ( action == 'Downlad' ):
+		ret = 0
+	else:
+		ret = 1
 	
 	# Get the stream info
 	xml = geturllib.GetURL( "http://ais.channel4.com/asset/%s" % episodeId, 0 )
@@ -154,14 +162,11 @@ def PlayOrDownloadEpisode( episodeId, title, defFilename='' ):
 		xbmc.Player().play( playURL, li )
 	else:
 		# Download
-		import xbmcaddon
-		addon = xbmcaddon.Addon(id=gPluginName)
-		
 		# Ensure rtmpdump has been located
 		rtmpdump_path = addon.getSetting('rtmpdump_path')
 		if ( rtmpdump_path is '' ):
 			d = xbmcgui.Dialog()
-			d.ok('Download Error','You have not located your rtmpdump executable.\n Please set the addon settings and try again.','','')
+			d.ok('Download Error','You have not located your rtmpdump executable.\n Please update the addon settings and try again.','','')
 			addon.openSettings(sys.argv[ 0 ])
 			return
 			
@@ -169,7 +174,7 @@ def PlayOrDownloadEpisode( episodeId, title, defFilename='' ):
 		downloadFolder = addon.getSetting('download_folder')
 		if downloadFolder is '':
 			d = xbmcgui.Dialog()
-			d.ok('Download Error','You have not set the default download folder.\n Please set the addon settings and try again.','','')
+			d.ok('Download Error','You have not set the default download folder.\n Please update the addon settings and try again.','','')
 			addon.openSettings(sys.argv[ 0 ])
 			return
 			
