@@ -198,19 +198,16 @@ def PlayOrDownloadEpisode( episodeId, title, defFilename='' ):
 				return
 				
 		savePath = os.path.join( "T:"+os.sep, downloadFolder, filename )
-		from subprocess import Popen, PIPE, STDOUT, STARTUPINFO
+		from subprocess import Popen, PIPE, STDOUT
 		
 		cmdline = CreateRTMPDUMPCmd( rtmpdump_path, streamUri, auth, savePath ) 
-		#print cmdline 
 		xbmc.executebuiltin('XBMC.Notification(4oD,Starting download: %s)' % filename)
 		p = Popen( cmdline, shell=True, stdin=PIPE, stdout=PIPE, stderr=STDOUT )
 		x = p.stdout.read()
-		#print p.stdout.read()
 		import time 
 		while p.poll() == None:
 			time.sleep(2)
 			x = p.stdout.read()
-			#print p.stdout.read()
 			
 		xbmc.executebuiltin("XBMC.Notification(Download Finished!,"+filename+",2000)")
 	
