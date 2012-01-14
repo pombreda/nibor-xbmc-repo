@@ -222,8 +222,9 @@ def PlayOrDownloadEpisode( episodeId, title, defFilename='' ):
 
 def Play( refId, title ):
 	playerKey = '8e8e110bb9d7d95eb3c3e500a86a21024eccd983'
-	url = ''
-	playerID = '105253688001'
+	url = 'http://www.channel5.com/shows'
+	#playerID = '105253688001'
+	playerID = '1384899516001'
 	x = get_episode_info( playerKey, refId, url, playerID )
 	z = x['programmedContent']
 	y = z['videoPlayer']
@@ -248,8 +249,9 @@ def Play( refId, title ):
 
 def CreateRTMPDUMPCmd( refId, rtmpdump_path, savePath ):
 	playerKey = '8e8e110bb9d7d95eb3c3e500a86a21024eccd983'
-	url = ''
-	playerID = '105253688001'
+	url = 'http://www.channel5.com/shows'
+	#playerID = '105253688001'
+	playerID = '1384899516001'
 	x = get_episode_info( playerKey, refId, url, playerID )
 	z = x['programmedContent']
 	y = z['videoPlayer']

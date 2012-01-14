@@ -1,3 +1,7 @@
+Version 1.0.1 (14 Jan 2012)
+
+- Updated in response to changes to the Demand 5 service which caused playback and download to fail
+
 Version 1.0.0 (10 Jan 2012)
 
 - Initial release
