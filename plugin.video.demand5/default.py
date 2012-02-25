@@ -81,9 +81,23 @@ def ShowEpisodes( showId, showTitle ):
 	# Get the page with episodes for this show
 	print "Looking for episodes for: " + showTitle
 	url = "http://www.channel5.com" + showId + "/episodes"
-	print "URL: " + url
-	html = geturllib.GetURL( url, 20000 ) # ~6 hrs
-	
+
+        html    = geturllib.GetURL( url, 20000 ) # ~6 hrs  
+	epsInfo = re.findall( 'episodes\?season=(.*?)">(.*?)</a>', html, re.DOTALL )
+ 		
+	for season, series in epsInfo:                      
+            ParseEpisodes(url+"?season="+season, showTitle, series)
+
+        if len(epsInfo) == 0:
+            ParseEpisodes(url, showTitle)
+
+        xbmcplugin.endOfDirectory( handle=gPluginHandle, succeeded=True )
+
+def ParseEpisodes(url, showTitle, series = ""):      	
+
+        print "URL: " + url
+        html = geturllib.GetURL( url, 20000 ) # ~6 hrs  
+
 	listItems = []
 	# Does this show have multiple episodes?
 	x = re.search( '<ul class="resource_list episodes">(.*?)<!-- /#contents -->', html, re.DOTALL)
@@ -106,9 +120,13 @@ def ShowEpisodes( showId, showTitle ):
 			title = title.replace( "&pound;", '£' )
 			
 			fn = showTitle + " - " + title
+			fn = re.sub('[:\\/*?\<>|"]+', '.', fn)
 			
-			if ( re.search( 'vod_availability', x, re.DOTALL) ):
-				newListItem = xbmcgui.ListItem(title)
+			if ( re.search( 'vod_availability', x, re.DOTALL) ): 
+                                fullTitle = title
+                                if series != "":
+                                    fullTitle = series + ": " + fullTitle                                 
+				newListItem = xbmcgui.ListItem(fullTitle)
 				newListItem.setThumbnailImage(thumbnail)
 				newListItem.setInfo('video', {'Title': title, 'Plot': description, 'PlotOutline': description})
 				url = gBaseURL + '?ep=' + mycgi.URLEscape(href) + "&title=" + mycgi.URLEscape(title) + "&fn=" + mycgi.URLEscape(fn)
@@ -137,8 +155,7 @@ def ShowEpisodes( showId, showTitle ):
 		listItems.append( (url,newListItem,False) )
 		
 	xbmcplugin.addDirectoryItems( handle=gPluginHandle, items=listItems )
-	#xbmcplugin.setContent(handle=gPluginHandle, content='episodes')
-	xbmcplugin.endOfDirectory( handle=gPluginHandle, succeeded=True )
+	#xbmcplugin.endOfDirectory( handle=gPluginHandle, succeeded=True )
 
 #==============================================================================
 
@@ -199,6 +216,7 @@ def PlayOrDownloadEpisode( episodeId, title, defFilename='' ):
 			if ( downloadFolder == '' ):
 				return
 				
+		filename = re.sub('[:\\/*?\<>|"]+', '', filename)
 		savePath = os.path.join( "T:"+os.sep, downloadFolder, filename )
 		from subprocess import Popen, PIPE, STDOUT
 		
@@ -305,12 +323,12 @@ class ContentOverride(object):
 		self.featuredRefId = None
 
 def build_amf_request(key, content_refid, url, exp_id):
-	import pyamf
+	from pyamf import register_class
 	from pyamf import remoting
 	
 	const = '686a10e2a34ec3ea6af8f2f1c41788804e0480cb'
-	pyamf.register_class(ViewerExperienceRequest, 'com.brightcove.experience.ViewerExperienceRequest')
-	pyamf.register_class(ContentOverride, 'com.brightcove.experience.ContentOverride')
+	register_class(ViewerExperienceRequest, 'com.brightcove.experience.ViewerExperienceRequest')
+	register_class(ContentOverride, 'com.brightcove.experience.ContentOverride')
 	content_override = ContentOverride(0)
 	content_override.contentRefId = content_refid
 	viewer_exp_req = ViewerExperienceRequest(url, [content_override], int(exp_id), key)
