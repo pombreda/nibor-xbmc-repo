@@ -20,7 +20,7 @@
 
 <addon id="plugin.video.demand5"
        name="Demand 5"
-       version="1.0.1"
+       version="1.0.2"
        provider-name="nibor">
     <requires>
         <import addon="xbmc.python" version="1.0"/>
