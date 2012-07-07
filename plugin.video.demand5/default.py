@@ -362,7 +362,7 @@ def get_episode_info(key, content_refid, url, exp_id):
    
 if __name__ == "__main__":
 	try:
-		geturllib.SetCacheDir( xbmc.translatePath(os.path.join( "T:"+os.sep,"addon_data", gPluginName,'cache' )) )
+		geturllib.SetCacheDir( xbmc.translatePath( os.path.join("special://profile", "addon_data", gPluginName,'cache' ) ) )
 		
 		if ( mycgi.EmptyQS() ):
 			ShowCategories()

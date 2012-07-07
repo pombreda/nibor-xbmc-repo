@@ -1,3 +1,7 @@
+Version 1.0.3 (7 Jul 2012)
+
+- Fixed compatibility issue with XBMC Eden 11.0
+
 Version 1.0.2 (25 Feb 2012)
 
 - Fixed episode parsing problem on some shows (all credit to Spoyser for this patch)
