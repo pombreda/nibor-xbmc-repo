@@ -74,11 +74,10 @@ def ShowCategory( category ):
 #==============================================================================
 
 def ShowEpisodes( showId, showTitle ):
-	html = geturllib.GetURL( "http://www.channel4.com/programmes/" + showId + "/4od", 20000 ) # ~6 hrs
+	html = geturllib.GetURL( "http://www.channel4.com/programmes/" + showId + "/4od", 10000 ) # ~3 hrs
 	genre = re.search( '<meta name="primaryBrandCategory" content="(.*?)"/>', html, re.DOTALL ).groups()[0]
 	ol = re.search( '<ol class="all-series">(.*?)</div>', html, re.DOTALL ).groups()[0]
-	epsInfo = re.findall( '<li.*?data-episode-number="(.*?)".*?data-assetid="(.*?)".*?data-episodeUrl="(.*?)".*?data-image-url="(.*?)".*?data-txDate="(.*?)".*?data-episodeTitle="(.*?)".*?data-episodeInfo="(.*?)".*?data-episodeSynopsis="(.*?)".*?data-series-number="(.*?)"', ol, re.DOTALL )
-	
+	epsInfo = re.findall( '<li.*?data-episode-number="(.*?)".*?data-assetid="(.*?)".*?data-episodeurl="(.*?)".*?data-image-url="(.*?)".*?data-txdate="(.*?)".*?data-episodetitle="(.*?)".*?data-episodeinfo="(.*?)".*?data-episodesynopsis="(.*?)".*?data-series-number="(.*?)"', ol, re.DOTALL )
 	listItems = []
 	epsDict = dict()
 	for epInfo in epsInfo:
@@ -147,9 +146,10 @@ def PlayOrDownloadEpisode( episodeId, title, defFilename='' ):
 	cdn = re.search( '<cdn>(.*?)</cdn>', uriData, re.DOTALL).groups()[0]
 	decodedToken = fourOD_token_decoder.Decode4odToken(token)
 	if ( cdn ==  "ll" ):
-		ip = re.search( '<ip>(.*?)</ip>', uriData, re.DOTALL ).groups()[0]
+		#ip = re.search( '<ip>(.*?)</ip>', uriData, re.DOTALL ).groups()[0]
 		e = re.search( '<e>(.*?)</e>', uriData, re.DOTALL ).groups()[0]
-		auth = "e=%s&ip=%s&h=%s" % (e,ip,decodedToken)
+		#auth = "e=%s&ip=%s&h=%s" % (e,ip,decodedToken)
+		auth = "e=%s&h=%s" % (e,decodedToken)
 	else:
 		fingerprint = re.search( '<fingerprint>(.*?)</fingerprint>', uriData, re.DOTALL ).groups()[0]
 		slist = re.search( '<slist>(.*?)</slist>', uriData, re.DOTALL ).groups()[0]
@@ -161,7 +161,7 @@ def PlayOrDownloadEpisode( episodeId, title, defFilename='' ):
 		url = url.replace( '.com/', '.com:1935/' )
 		playpath = re.search( '(mp4:.*)', streamUri, re.DOTALL ).groups()[0]
 		playpath = playpath + '?' + auth
-		swfplayer = "http://www.channel4.com/static/programmes/asset/flash/swf/4odplayer-11.8.5.swf"
+		swfplayer = "http://www.channel4.com/static/programmes/asset/flash/swf/4odplayer-11.27.3.swf"
 		playURL = "%s?ovpfv=1.1&%s playpath=%s swfurl=%s swfvfy=true" % (url,auth,playpath,swfplayer)
 		
 		li = xbmcgui.ListItem(title)
@@ -228,7 +228,7 @@ def CreateRTMPDUMPCmd( rtmpdump_path, streamUri, auth, savePath ):
 	#-r "rtmpe://ak.securestream.channel4.com:1935/4oD/?ovpfv=1.1&auth=da_ana4cDc3d_d4dtaPd0clcndUa3claHcG-boODFj-eS-gxS-s8p4mbq4tRlim9lSmdpcp6l1nb&aifp=v002&slist=assets/CH4_08_02_900_47548001001002_005.mp4"
 	#-a "4oD/?ovpfv=1.1&auth=da_ana4cDc3d_d4dtaPd0clcndUa3claHcG-boODFj-eS-gxS-s8p4mbq4tRlim9lSmdpcp6l1nb&aifp=v002&slist=assets/CH4_08_02_900_47548001001002_005.mp4"
 	#-f "WIN 11,0,1,152"
-	#-W "http://www.channel4.com/static/programmes/asset/flash/swf/4odplayer-11.8.5.swf"
+	#-W "http://www.channel4.com/static/programmes/asset/flash/swf/4odplayer-11.27.3.swf"
 	#-p "http://www.channel4.com/programmes/peep-show/4od/player/3156662"
 	#-C Z:
 	#-y "mp4:assets/CH4_08_02_900_47548001001002_005.mp4"
@@ -239,16 +239,14 @@ def CreateRTMPDUMPCmd( rtmpdump_path, streamUri, auth, savePath ):
 	rtmpUrl = rtmpUrl + "?ovpfv=1.1&" + auth
 	app = re.search( '.com/(.*?)mp4:', streamUri, re.DOTALL ).groups()[0]
 	app = app + "?ovpfv=1.1&" + auth
-	#swfplayer = "http://www.channel4.com/static/programmes/asset/flash/swf/4odplayer-11.8.swf"
-	swfplayer = "http://www.channel4.com/static/programmes/asset/flash/swf/4odplayer-11.8.5.swf"
+	swfplayer = "http://www.channel4.com/static/programmes/asset/flash/swf/4odplayer-11.27.3.swf"
 	playpath = re.search( '.*?(mp4:.*)', streamUri, re.DOTALL ).groups()[0]
 	playpath = playpath + "?" + auth
 	args = [
 				rtmpdump_path,
 				"--rtmp", '"%s"' % rtmpUrl,
 				"--app", '"%s"' % app,
-				#"--flashVer", '"WIN 10,3,183,7"',
-				"--flashVer", '"WIN 11,0,1,152"',
+				"--flashVer", '"WIN 11,2,202,235"',
 				"--swfVfy", '"%s"' % swfplayer,
 				#"--pageUrl xxxxxx",
 				"--conn", "Z:",
@@ -306,7 +304,7 @@ def remove_extra_spaces(data):
    
 if __name__ == "__main__":
 	try:
-		geturllib.SetCacheDir( xbmc.translatePath(os.path.join( "T:"+os.sep,"addon_data", gPluginName,'cache' )) )
+		geturllib.SetCacheDir( xbmc.translatePath( os.path.join("special://profile", "addon_data", gPluginName,'cache' ) ) )
 		
 		if ( mycgi.EmptyQS() ):
 			ShowCategories()

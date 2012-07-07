@@ -1,3 +1,8 @@
+Version 1.0.2 (7 Jul 2012)
+
+- Fixed compatibility with XBMC Eden 11.0
+- Updated to handle recent 4oD changes
+
 Version 1.0.1 (29 Dec 2011)
 
 - Added a setting for default select action: Play/Download/Ask (Thanks to alcoheca)
