@@ -161,7 +161,7 @@ def PlayOrDownloadEpisode( episodeId, title, defFilename='' ):
 		url = url.replace( '.com/', '.com:1935/' )
 		playpath = re.search( '(mp4:.*)', streamUri, re.DOTALL ).groups()[0]
 		playpath = playpath + '?' + auth
-		swfplayer = "http://www.channel4.com/static/programmes/asset/flash/swf/4odplayer-11.27.3.swf"
+		swfplayer = "http://www.channel4.com/static/programmes/asset/flash/swf/4odplayer-11.31.swf"
 		playURL = "%s?ovpfv=1.1&%s playpath=%s swfurl=%s swfvfy=true" % (url,auth,playpath,swfplayer)
 		
 		li = xbmcgui.ListItem(title)
@@ -239,7 +239,7 @@ def CreateRTMPDUMPCmd( rtmpdump_path, streamUri, auth, savePath ):
 	rtmpUrl = rtmpUrl + "?ovpfv=1.1&" + auth
 	app = re.search( '.com/(.*?)mp4:', streamUri, re.DOTALL ).groups()[0]
 	app = app + "?ovpfv=1.1&" + auth
-	swfplayer = "http://www.channel4.com/static/programmes/asset/flash/swf/4odplayer-11.27.3.swf"
+	swfplayer = "http://www.channel4.com/static/programmes/asset/flash/swf/4odplayer-11.31.swf"
 	playpath = re.search( '.*?(mp4:.*)', streamUri, re.DOTALL ).groups()[0]
 	playpath = playpath + "?" + auth
 	args = [

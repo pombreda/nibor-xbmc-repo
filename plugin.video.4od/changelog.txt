@@ -1,3 +1,7 @@
+Version 1.0.3 (28 Sep 2012)
+
+- Updated to handle recent 4oD changes
+
 Version 1.0.2 (7 Jul 2012)
 
 - Fixed compatibility with XBMC Eden 11.0
